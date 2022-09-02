@@ -1,0 +1,25 @@
+alias html='cd /var/www/html'
+alias www='cd /var/www/'
+alias ..='cd ../'
+alias ...='cd ../../'
+alias ....='cd ../../../'
+
+### PROGRAMS
+alias explore='explorer.exe .'
+
+### GENERAL
+alias setSource='source $HOME/.bashrc'
+alias apti='apt install -y'
+
+### GIT
+alias gs='git status'
+alias gc='git commit -m'
+
+### LARVEL
+alias pa='php artisan'
+alias pf='clear && ./vendor/bin/phpunit --filter'
+alias punit='clear && ./vendor/bin/phpunit'
+alias pest='clear && ./vendor/bin/pest'
+
+### SSH
+alias ssh[XYZ]='ssh [SSH-USER]@[SERVER_DOMAIN]'

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# The user you use in this WSL-Distro
+WSL_USER=
+
+# The email-address you want to use for your vhosts
+WSL_EMAIL=
+
+# The directory path for the available vhost configurations
+WSL_VHOSTS_AVAILABLE='/etc/apache2/sites-available/'
+
+# The directory path for the activated vhost configurations
+WSL_VHOSTS_ENABLED='/etc/apache2/sites-enabled/'
+
+# The directory path to your webservers root directory
+WSL_WEBDIR='/var/www/'

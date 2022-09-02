@@ -1,0 +1,52 @@
+#!/bin/bash
+
+PHPfrom=$1
+PHPto=$2
+
+if [ "$(whoami)" != 'root' ]; then
+	echo $"You have no permission to run $0 as non-root user. Use sudo"
+	exit 1;
+fi
+
+while [ "$PHPfrom" == '' ]
+do
+	echo $"Please provide the currently activated php-version (e.g. '7.4')"
+	read PHPfrom
+done
+
+while [ "$PHPto" == "" ]
+do
+	echo -e $"Please provide the php-version you want to activate (e.g. '8.1')"
+	read PHPto
+done
+
+if [[ "${PHPfrom,,}" == *"php"* ]]; then	
+	echo $"Please provide just the version number for the version you want to deactivate."
+	while [[ "${PHPfrom,,}" == *"php"* ]]
+	do
+		read PHPfrom
+	done
+fi
+
+if [[ "${PHPto,,}" == *"php"* ]]; then
+        echo $"Please provide just the version number for the version you want to activate."
+        while [[ "${PHPto,,}" == *"php"* ]]
+        do
+                read PHPto
+        done
+fi
+
+if ! [ -e /usr/bin/php$PHPfrom ]; then
+	echo $"php$PHPfrom does not exist in /usr/bin/."
+	exit 1;
+fi
+
+if ! [ -e /usr/bin/php$PHPto ]; then
+        echo $"php$PHPto does not exist in /usr/bin/."
+        exit 1;
+fi
+
+update-alternatives --set php /usr/bin/php$PHPto
+a2dismod php$PHPfrom
+a2enmod php$PHPto
+service apache2 restart
