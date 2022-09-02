@@ -6,6 +6,9 @@ alias ....='cd ../../../'
 
 ### PROGRAMS
 alias explore='explorer.exe .'
+alias wslIgnite='code ~/wslIgnite'
+alias e-wslInstall='code ~/wslIgnite/wsl-install.md'
+alias e-alias='code ~/wslIgnite/.bash_aliases'
 
 ### GENERAL
 alias setSource='source $HOME/.bashrc'
