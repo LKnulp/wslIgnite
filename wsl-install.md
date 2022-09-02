@@ -523,3 +523,15 @@ https://github.com/RedberryProducts/configs/blob/php-cs-fixer/.php-cs-fixer.php
 # Composer
 
 https://www.digitalocean.com/community/tutorials/how-to-install-and-use-composer-on-ubuntu-20-04-de
+
+# Useful tools
+
+## Pipe Viewer
+
+https://www.ivarch.com/programs/pv.shtml
+
+> usefull to see for example progress of sql-import
+>
+> ```shell
+> $ pv sqlfile.sql | mysql -uxxx -pxxxx dbname
+> ```
