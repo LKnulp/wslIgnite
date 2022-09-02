@@ -6,9 +6,12 @@ alias ....='cd ../../../'
 
 ### PROGRAMS
 alias explore='explorer.exe .'
+
+### Edit shortcuts
 alias wslIgnite='code ~/wslIgnite'
 alias e-wslInstall='code ~/wslIgnite/wsl-install.md'
 alias e-alias='code ~/wslIgnite/.bash_aliases'
+alias e-winHosts='/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code /mnt/c/Windows/System32/drivers/etc/hosts'
 
 ### GENERAL
 alias setSource='source $HOME/.bashrc'
