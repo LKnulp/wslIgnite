@@ -28,16 +28,6 @@ function show_help {
 	echo -e "	}"
 }
 
-configFile=./spark.conf
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
-if [ ! -f $configFile ]; then
-	echo -e $"${ERROR}You have no configuration file at '$SCRIPT_DIR/spark.conf'!${NC}"
-	exit 1;
-else
-	source $configFile
-fi
-
 debug="false"
 changePHP="true"
 aliases="true"
@@ -48,9 +38,8 @@ wsl="true"
 configPHP="true"
 install="true"
 remove="false"
-
-WSL_IGNITE_EXEC_PATH=$(echo $WSL_IGNITE_EXEC_PATH | sed 's:/*$::')
-WSL_IGNITE_WSLCONF_PATH=$(echo $WSL_IGNITE_WSLCONF_PATH | sed 's:/*$::')
+configFile=./spark.conf
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 while [ -n "$1" ]; do # while loop starts
 	case "$1" in
@@ -101,26 +90,33 @@ if [ $install == "true" ]; then
 else
 	echo -e $"\n* ${PROCESSING}We will start VS-Code. Uninstall will continue here...${NC}\n"
 fi
+
 /mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code > /dev/null
 sleep 1s
 echo -e $"* ${PROCESSING}Starting VS-Code...${NC}\n"
 sleep 1s
 
-showConfig='n'
-
 if [ $install == "true" ]; then
-	echo -e -n $"${QUESTION}We lost focus, please click here to answer.\nDid you check the $configFile to be correct? (y = skip / anyKey = open) ${NC}\n"
-	read showConfig
-	if [ $showConfig != 'y' ]; then
-		echo -e $"${QUESTION}Switch your attention to VS-Code...${NC}\n"
-		/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code $configFile > /dev/null
-		echo -e -n $"${QUESTION}Configuration OK?... Great! Press ENTER to continue...${NC}\n"
-		read configSet
-		source $configFile
-	else
-		echo -e -n $"* ${PROCESSING}Nevermind... Continue...? (Press ENTER)\n${NC}"
-		read configSet
-	fi
+	echo -e $"* ${PROCESSING}Installing spark.conf...\n${NC}"
+	cp $SCRIPT_DIR/fuel/spark.conf.example $SCRIPT_DIR/spark.conf
+
+	echo -e $"${QUESTION}Please complete the install configuration with your linux user${NC}\n"
+	echo -e -n $"${QUESTION}Press ENTER to open install-config...${NC}\n"
+	read configSet
+	nano $SCRIPT_DIR/spark.conf
+
+	echo -e -n $"${QUESTION}Configuration OK?... Great! Press ENTER to continue...${NC}\n"
+	read configSet
+fi
+
+if [ ! -f $configFile ]; then
+	echo -e $"${ERROR}You have no configuration file at '$SCRIPT_DIR/spark.conf'!${NC}"
+	exit 1;
+else
+	source $configFile
+	WSL_IGNITE_EXEC_PATH=$(echo $WSL_IGNITE_EXEC_PATH | sed 's:/*$::')
+	WSL_IGNITE_WSLCONF_PATH=$(echo $WSL_IGNITE_WSLCONF_PATH | sed 's:/*$::')
+	chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $SCRIPT_DIR/spark.conf
 fi
 
 if [ $$WSL_IGNITE_USER == '' ]; then
@@ -188,7 +184,7 @@ if [ $install == "true" ]; then
 		cd $HOME/.vim/colors
 		echo -e $"* ${PROCESSING}Installing vim colorscheme 'molokai'...\n${NC}"
 		curl -o molokai.vim https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim
-		echo "\n"
+		echo -e "\n"
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/colors/molokai.vim
 	fi
 
@@ -219,7 +215,11 @@ if [ $install == "true" ]; then
 		chmod 775 $SCRIPT_DIR/configPHP.sh
 	fi
 
-	echo -e $"\n${SUCCESS}Installation complete!!${NC}\n"
+	echo -e -n $"${QUESTION}Please check VS-Code to complete all installed config-files. Press ENTER to continue...${NC}\n"
+	read installComplete
+
+	echo -e $"\n${SUCCESS}Installation complete!!${NC}"
+	echo -e $"${QUESTION}Please run source ~/.bashrc to enable new configuration${NC}\n"
 	exit 1;
 fi
 
@@ -269,6 +269,14 @@ if [ $remove == "true" ]; then
 	rm $SCRIPT_DIR/configPHP.sh
 	rm $WSL_IGNITE_EXEC_PATH/configPHP
 
-	echo -e $"\n${SUCCESS}Uninstall complete!!${NC}\n"
+	echo -e $"* ${PROCESSING}Removing spark.conf...\n${NC}"
+
+	rm $SCRIPT_DIR/spark.conf
+
+	echo -e -n $"${QUESTION}Please check VS-Code to see your new .bash_alises file. Press ENTER to continue...${NC}\n"
+	read installComplete
+
+	echo -e $"\n${SUCCESS}Uninstall complete!!${NC}"
+	echo -e $"${QUESTION}Please run source ~/.bashrc to enable new configuration${NC}\n"
 	exit 1;
 fi

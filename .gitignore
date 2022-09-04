@@ -7,3 +7,4 @@ configPHP.sh
 wslIgnite.conf
 vimrc
 tmux.conf
+spark.conf

@@ -105,11 +105,14 @@ wslIgnite/............................ Your wslIgnite-package directory, may var
 |	│
 |	├── configPHP.sh.example.......... A tool to change basic setting of a PHP-version to make local-dev easier.
 │   │                                  For CLI and apache2
-│	├── tmux.conf.example............ A very basic tmux configuration to make live easier (mouse-support)
+|	|
+|	├── spark.conf.example............ Configuration for the install-script
+|	|
+│	├── tmux.conf.example............. A very basic tmux configuration to make live easier (mouse-support)
 │   │
 │	├── vhost.sh.example.............. A tool to create or remove vhosts (directories and configuration) for apache2
 │   │
-│	├── vimrc.example................ A very basic vim configuration to make it look better
+│	├── vimrc.example................. A very basic vim configuration to make it look better
 │   │
 |	├── wsl.conf.example.............. A basic configuration of WSL to make networking easier
 │   │
@@ -125,7 +128,7 @@ wslIgnite/............................ Your wslIgnite-package directory, may var
 │
 ├── README.md
 │
-├── spark.conf........................ The configuration for the install-script
+├── ***spark.conf..................... The configuration for the install-script
 │
 ├── spark.sh.......................... The install-script
 │
