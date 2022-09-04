@@ -1,0 +1,87 @@
+#!/bin/bash
+
+### Set colors
+ERROR='\033[1;35m' # light purple
+QUESTION='\033[1;33m' # yellow
+SUCCESS='\033[0;32m' # green
+PROCESSING='\033[1;36m' # light cyan
+NC='\033[0m' # No Color
+
+function show_help {
+	echo -e "\nUsage: sudo $BASH_SOURCE [ ? OPTIONS ] [ PHP VERSION ]\n"
+	echo -e "   This will set the following directives"
+	echo -e "   for apache2-php.ini and cli-php.ini:"
+	echo -e "      memory_size         =    1024M (not for cli)"
+	echo -e "      post_max_size       =    2048M"
+	echo -e "      upload_max_filesize =    2048M"
+	echo -e "   ================================="
+	echo -e "	OPTIONS := { -h[elp] }"
+}
+
+function getSource {
+	SOURCE=${BASH_SOURCE[0]}
+	while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+		DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+		SOURCE=$(readlink "$SOURCE")
+		[[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+	done
+	SCRIPT_EXEC_PATH=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+}
+
+getSource
+
+configFile=$SCRIPT_EXEC_PATH/wslIgnite.conf
+
+if [ ! -f $configFile ]; then
+	echo -e $"${ERROR}You have no configuration file at '$SCRIPT_EXEC_PATH/wslIgnite.conf'!${NC}"
+	exit 0;
+else
+	source $configFile
+	PHP_INI_PATH=$(echo $PHP_INI_PATH | sed 's:/*$::')
+fi
+
+help=$1
+
+if [ "$help" == "-h" ]; then
+	show_help
+	exit 1;
+else 
+	PHP=$1
+fi
+
+if [ "$(whoami)" != 'root' ]; then
+	echo -e $"${ERROR}You have no permission to run $0 as non-root user. Use sudo! ${NC}"
+	exit 0;
+fi
+
+while [ "$PHP" == '' ]
+do
+	echo -e $"${QUESTION}Please provide the PHP-version you want to configure (e.g. '8.1') ${NC}"
+	read PHP
+done
+
+memory_limit=1024M
+upload_max_filesize=2048M
+post_max_size=2048M
+
+for key in memory_limit upload_max_filesize post_max_size
+do
+	echo -e $"* ${PROCESSING}Setting $key for apache...\n${NC}"
+	sed -i "s/^\($key\).*/\1 $(eval echo = \${$key})/" $PHP_VERSION_PATH/$PHP/apache2/php.ini
+done
+
+echo -e $"* ${PROCESSING}Setting $key for apache...\n${NC}"
+/etc/init.d/apache2 reload > /dev/null
+
+for key in upload_max_filesize post_max_size
+do
+	echo -e $"* ${PROCESSING}Setting $key for cli...\n${NC}"
+	sed -i "s/^\($key\).*/\1 $(eval echo = \${$key})/" $PHP_VERSION_PATH/$PHP/cli/php.ini
+	
+	currentActivePhpDirective=$(php -i | grep $key)
+	echo -e $"* ${QUESTION}PHP-CLI says: $currentActivePhpDirective\n${NC}"
+done
+
+
+echo -e $"\n${SUCCESS}Complete! \nYour PHP$PHP is now configured!${NC}\n"
+exit 1;

@@ -1,3 +1,9 @@
 .bash_aliases
 wsl.cfg
 wsl.conf
+changePHP.sh
+vhost.sh
+configPHP.sh
+wslIgnite.conf
+vimrc
+tmux.conf

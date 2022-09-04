@@ -1,0 +1,39 @@
+#=======================
+#
+#	vhost-script
+#
+#=======================
+
+# The user you use in this WSL-Distro
+WSL_USER=
+
+# The email-address you want to use for your vhosts
+WSL_EMAIL=
+
+# The directory path for the available vhost configurations
+WSL_VHOSTS_AVAILABLE='/etc/apache2/sites-available/'
+
+# The directory path for the activated vhost configurations
+WSL_VHOSTS_ENABLED='/etc/apache2/sites-enabled/'
+
+# The directory path to your webservers root directory
+WSL_WEBDIR='/var/www/'
+
+#=======================
+#
+#	configPHP-script
+#
+#=======================
+
+# The path where php.ini is available. Give just before the version number.
+# e.g. if PHP is located at "/etc/php/[VERSION]/apache2/php.ini" just give "/etc/php"
+PHP_INI_PATH='/etc/php/'
+
+#=======================
+#
+#	changePHP-script
+#
+#=======================
+
+# The directory path where PHP-executables are available
+PHP_EXEC_PATH='/usr/local/bin/'
