@@ -69,7 +69,9 @@ $ sudo ./spark.sh -h
 source ~/.bashrc
 ```
 
-&nbsp; after the installation finished.
+&nbsp; after the installation finished to enable all new configuration and aliases.  
+&nbsp; Additionally, all installed config files which may need you attention, will be opened in VS-Code.  
+&nbsp; Please make sure to check them and especially add `WSL_USER` and `WSL_EMAIL`whithin the `wslIgnite.conf`.
 
 ---
 
