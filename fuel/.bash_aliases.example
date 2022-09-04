@@ -21,6 +21,8 @@ alias apti='apt install -y'
 ### GIT
 alias gs='git status'
 alias gc='git commit -m'
+alias gla='git log --all --graph'
+alias gl='git log --graph'
 
 ### LARVEL
 alias pa='php artisan'
