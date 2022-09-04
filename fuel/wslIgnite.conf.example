@@ -36,4 +36,4 @@ PHP_INI_PATH='/etc/php/'
 #=======================
 
 # The directory path where PHP-executables are available
-PHP_EXEC_PATH='/usr/local/bin/'
+PHP_EXEC_PATH='/usr/bin/'
