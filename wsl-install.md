@@ -524,9 +524,7 @@ https://github.com/RedberryProducts/configs/blob/php-cs-fixer/.php-cs-fixer.php
 
 https://www.digitalocean.com/community/tutorials/how-to-install-and-use-composer-on-ubuntu-20-04-de
 
-# SQlite >3.38 (relevant for e.g. JSON-columns in laravel >=9)
-
-https://stackoverflow.com/questions/64861331/how-can-i-install-or-upgrade-to-sqlite-3-33-0-on-ubuntu-18-04
+# SQlite >3.38 for PHP (relevant for e.g. JSON-columns in laravel >=9)
 
 https://vikborges.com/articles/making-php-8-use-the-latest-version-of-sqlite3-on-ubuntu-20-04-lts
 
