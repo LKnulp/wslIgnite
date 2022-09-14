@@ -524,6 +524,22 @@ https://github.com/RedberryProducts/configs/blob/php-cs-fixer/.php-cs-fixer.php
 
 https://www.digitalocean.com/community/tutorials/how-to-install-and-use-composer-on-ubuntu-20-04-de
 
+# SQlite >3.38 (relevant for e.g. JSON-columns in laravel >=9)
+
+https://stackoverflow.com/questions/64861331/how-can-i-install-or-upgrade-to-sqlite-3-33-0-on-ubuntu-18-04
+
+```shell
+	wget https://sqlite.org/2021/sqlite-autoconf-3340100.tar.gz
+	tar -xvf sqlite-autoconf-3340100.tar.gz && cd sqlite-autoconf-3340100
+	sudo apt-get install libreadline-dev
+	./configure
+	make
+	sudo apt-get purge sqlite3
+	sudo make install
+	export PATH="/usr/local/bin:$PATH"  # also add in your .bashrc
+	sqlite3 --version
+```
+
 # Useful tools
 
 ## Pipe Viewer
