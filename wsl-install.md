@@ -528,8 +528,10 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-composer
 
 https://stackoverflow.com/questions/64861331/how-can-i-install-or-upgrade-to-sqlite-3-33-0-on-ubuntu-18-04
 
+https://sqlite.org/download.html
+
 ```shell
-	wget https://sqlite.org/2021/sqlite-autoconf-3340100.tar.gz
+	wget https://sqlite.org/2021/sqlite-autoconf-3340100.tar.gz # select current version from sqlite.org
 	tar -xvf sqlite-autoconf-3340100.tar.gz && cd sqlite-autoconf-3340100
 	sudo apt-get install libreadline-dev
 	./configure
