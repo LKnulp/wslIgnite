@@ -528,6 +528,8 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-composer
 
 https://stackoverflow.com/questions/64861331/how-can-i-install-or-upgrade-to-sqlite-3-33-0-on-ubuntu-18-04
 
+https://vikborges.com/articles/making-php-8-use-the-latest-version-of-sqlite3-on-ubuntu-20-04-lts
+
 https://sqlite.org/download.html
 
 ```shell
