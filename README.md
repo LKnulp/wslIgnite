@@ -12,22 +12,33 @@
 
 ## Contents
 
-1. [How to use](#1-how-to-use)
-2. [Installation](#2-installation)
-   1. [By Script](#21-installation-by-script)
-   2. [Manually](#22-manual-install)
-   3. [Removing](#23-removing)
-3. [Whats in here](#3whats-in-here)
-   1. [General](#31-general)
-   2. [Tmux](#32-tmux)
-   3. [Vim](#33-vim)
-   4. [Bash-Aliases](#34-aliases)
-   5. [Change-PHP](#35-changephp)
-   6. [Vhost](#36-vhost)
-   7. [Wsl.conf](#37-wslconf)
-   8. [WslIgnite.conf](#38-wsligniteconf)
-   9. [Config-PHP](#39-configphp)
-4. [Manual Steps](#5-manual-installation)
+- [WSL-Ignite](#wsl-ignite)
+	- [Contents](#contents)
+	- [1. How to use](#1-how-to-use)
+	- [2. Installation](#2-installation)
+		- [2.1 Installation by script](#21-installation-by-script)
+		- [2.2 Manual install](#22-manual-install)
+		- [2.3 Removing](#23-removing)
+	- [3. What's in here](#3-whats-in-here)
+		- [3.1 General](#31-general)
+		- [3.2 Tmux](#32-tmux)
+		- [3.3 Vim](#33-vim)
+		- [3.4 Aliases](#34-aliases)
+		- [3.5 ChangePHP](#35-changephp)
+		- [3.6 Vhost](#36-vhost)
+		- [3.7 wsl.conf](#37-wslconf)
+		- [3.7.1 resolv.conf](#371-resolvconf)
+		- [3.8 wslIgnite.conf](#38-wsligniteconf)
+		- [3.9 ConfigPHP](#39-configphp)
+	- [4. Manual Installation](#4-manual-installation)
+		- [4.1 wslIgnite-conf](#41-wslignite-conf)
+		- [4.2 bash-aliases](#42-bash-aliases)
+		- [4.3 tmux-conf](#43-tmux-conf)
+		- [4.4 vimrc](#44-vimrc)
+		- [4.5 vhost](#45-vhost)
+		- [4.6 changePHP](#46-changephp)
+		- [4.7 wsl-conf](#47-wsl-conf)
+		- [4.8 config.php](#48-configphp)
 
 ## 1. How to use
 
@@ -156,7 +167,7 @@ Also, all of these (potentially) copied files are added to the `.gitignore` by d
 All of these config-files and tool-scripts will then be made usable by creating [sym-links](https://wiki.ubuntuusers.de/ln/) at the preferred locations all over the WSL-distro.
 
 <div style="background-color: #E67E22; padding: 5px;border-radius:5px;margin-bottom: 10px;">
-<b><u>Attention:</u> At the moment, this package is created an maintained to support a WSL-instance of Ubuntu 18/20/22 on a Windows-hostsystem 10/11. </b><br />  
+<b><u>Attention:</u> At the moment, this package is created an maintained to support a WSL1-instance of Ubuntu 18/20/22 on a Windows-hostsystem 10/11. </b><br />  
 <b>Moreover it assumes that an apache2 webserver as well as VS-Code is used.</b>
 </div>
 
@@ -227,13 +238,26 @@ pointing to the copied `vhost.sh` within the root of this package.
 > This file holds basic configuration for the WSL-distribution and was created using [documentation](https://docs.microsoft.com/de-de/windows/wsl/wsl-config).
 > Extend or change it by your needs.
 
-If you choose to install this, a sym-link at `/etc/wsl.conf` will be created,  
+If you choose to install this option, a sym-link at `/etc/wsl.conf` will be created,  
 pointing to the copied `wsl.conf` within the root of this package.
 
 <div style="background-color: #E67E22; padding: 5px; border-radius:5px;margin-bottom: 10px;">
 <b><u>Attention:</u> If you are using this on a Win10 host, make sure to remove the last line of this file as it only works correctly with Win11<br />
 and can cause unexpected behavior on Win10.</b>
 </div>
+
+### 3.7.1 resolv.conf
+
+---
+
+<div style="background-color: #E67E22; padding: 5px; border-radius:5px;margin-bottom: 10px;">
+<b><u>Attention:</u> This is only for documentation and not an acutal feature of this install script.</b>
+</div>
+
+If you encounter any network problems related to unresolvable names by DNS, check `/etc/resolv.conf`.  
+You may add some nameservers in the form `nameserver 1.1.1.1` each in an new line.  
+Use `wsl --shutdown` in PowerShell to terminate WSL and restart it.  
+Check DNS-resolve by pinging an actual Domain `ping heise.de`.
 
 ### 3.8 wslIgnite.conf
 

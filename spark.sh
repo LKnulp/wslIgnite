@@ -203,6 +203,7 @@ if [ $install == "true" ]; then
 		cp $SCRIPT_DIR/fuel/wsl.conf.example $SCRIPT_DIR/wsl.conf
 		ln -sf $SCRIPT_DIR/wsl.conf $WSL_IGNITE_WSLCONF_PATH/wsl.conf
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $WSL_IGNITE_WSLCONF_PATH/wsl.conf
+        chmod 666 $SCRIPT_DIR/wsl.conf
 		/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code $SCRIPT_DIR/wsl.conf > /dev/null
 	fi
 
