@@ -14,11 +14,11 @@ function show_help () {
     	debug=${true:-false}
 	
 	if [ debug == "true" ]; then
-    	echo -e "Usage:  $BASH_SOURCE [ OPTIONS ] ${PROCESSING}--${NC} [ DOMAIN ] [ ? RealiveRootDir ] "
+    	echo -e "Usage:  $BASH_SOURCE [ OPTIONS ] ${PROCESSING}--${NC} [ DOMAIN ]"
 		echo -e "					${PROCESSING}^^^^${NC}"
 		echo -e "					${PROCESSING}use${NC}"
 	else 
-    	echo -e "\nUsage:  $BASH_SOURCE [ OPTIONS ] -- [ DOMAIN ] [ ? RealiveRootDir ] \n"
+    	echo -e "\nUsage:  $BASH_SOURCE [ OPTIONS ] -- [ DOMAIN ]\n"
 		echo -e "   This creates a new vhost for apache2 with all directories and configuration"
 		echo -e "   ============="
     	echo -e "	OPTIONS := { "
