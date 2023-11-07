@@ -26,6 +26,23 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-phpmy
 > - `sudo a2enmod rewrite`
 > - `sudo service apache2 restart`
 
+# WSL 1 vs 2
+Call `127.0.0.1` in browser. This shouldn't work in WSL2 as it uses a different IP.  
+Requesting `localhost` however should work.  
+For WSL2 the vhosts in hostfile have to connect to `::1` instead of `127.0.0.1`.   
+
+## Setting static IP
+As PHPMyAdmin can requested via `localhost/phpmyadmin` on WSL2, this is probably not necessary.  
+But in case anyone would need it:  
+https://gist.github.com/wllmsash/1636b86eed45e4024fb9b7ecd25378ce
+
+## Windows Host-file
+
+Change  
+`127.0.0.1 local.vhost.tld`  
+to  
+`::1 local.vhost.tld`
+
 # PHP
 
 https://linuxize.com/post/how-to-install-php-8-on-ubuntu-20-04/
@@ -239,10 +256,6 @@ https://github.com/microsoft/WSL/issues/2113#issuecomment-704856068
   > <pre>
   > port= 8090
   > </pre>
-
-# Windows Host-file
-
-> `127.0.0.1 local.vhost.tld` >`::1 local.vhost.tld`
 
 # vhost-Script
 
