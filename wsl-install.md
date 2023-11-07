@@ -106,7 +106,7 @@ The error should now be gone.
 - `sudo apt install phpmyadmin`
   > ## Upgrade PhpMyAdamin from lower version without default repository
   >
-  > https://devanswers.co/manually-upgrade-phpmyadmin/  
+  > https://devanswe.rs/manually-upgrade-phpmyadmin/  
   > Research for latest PhpMyAdmin version here: https://www.phpmyadmin.net/downloads/  
   > For version `5.2.0` there is a `config.sample.inc.php` located at `/usr/share/phpmyadmin`
   > use this file to copy and insert the 32-char blowfish_secret.
