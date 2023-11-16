@@ -1,6 +1,4 @@
-# WSL2 Ubuntu 20.04
-
-https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-phpmyadmin-on-ubuntu-20-04-de
+# WSL2 Ubuntu 22.04
 
 # General
 
@@ -26,22 +24,18 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-phpmy
 > - `sudo a2enmod rewrite`
 > - `sudo service apache2 restart`
 
-# WSL 1 vs 2
-Call `127.0.0.1` in browser. This shouldn't work in WSL2 as it uses a different IP.  
-Requesting `localhost` however should work.  
-For WSL2 the vhosts in hostfile have to connect to `::1` instead of `127.0.0.1`.   
+## Change executive user
 
-## Setting static IP
-As PHPMyAdmin can requested via `localhost/phpmyadmin` on WSL2, this is probably not necessary.  
-But in case anyone would need it:  
-https://gist.github.com/wllmsash/1636b86eed45e4024fb9b7ecd25378ce
+https://www.simplified.guide/apache/change-user-and-group
 
-## Windows Host-file
-
-Change  
-`127.0.0.1 local.vhost.tld`  
-to  
-`::1 local.vhost.tld`
+> - `sudo vi /etc/apache2/apache2.conf`
+> - search for line 115 & 116
+  > <pre>
+  > User USERNAME
+  > Group GROUPNAME
+  > </pre>
+> - `sudo chown --recursive username:groupname /var/www`
+> - `sudo service apache2 restart`
 
 # PHP
 
@@ -50,16 +44,25 @@ https://linuxize.com/post/how-to-install-php-8-on-ubuntu-20-04/
 > - `sudo apt install software-properties-common`
 > - `sudo add-apt-repository ppa:ondrej/php`
 > - `sudo apt install php7.4 libapache2-mod-php7.4`
-> - `sudo apt install php7.4-mysql php7.4-curl php7.4-mbstring`
-> - `sudo apt install php7.4-gd php7.4-imagick php7.4-zip php7.4-xml php7.4-xdebug`
+> - `sudo apt install php7.4-mysql php7.4-curl php7.4-mbstring php7.4-xml php7.4-curl`
+
+> - `sudo apt install php8.0 libapache2-mod-php8.0`
+> - `sudo apt install php8.0-mysql php8.0-curl php8.0-mbstring php8.0-xml php8.0-curl`
+
+> - `sudo apt install php8.1 libapache2-mod-php8.1`
+> - `sudo apt install php8.1-mysql php8.1-curl php8.1-mbstring php8.1-xml php8.1-curl`
+
+> - `sudo apt install php8.2 libapache2-mod-php8.2`
+> - `sudo apt install php8.2-mysql php8.2-curl php8.2-mbstring php8.2-xml php8.2-curl`
 > - `sudo service apache2 restart`
->   > ## PHP-FPM (FastCGI)
->   >
->   > - `sudo apt update`
->   > - `sudo apt install php7.4-fpm libapache2-mod-fcgid`
->   > - `sudo a2enmod proxy_fcgi setenvif actions fcgid alias`
->   > - `sudo a2enconf php7.4-fpm`
->   > - `sudo service apache2 restart`
+
+## PHP-FPM (FastCGI)
+
+> - `sudo apt update`
+> - `sudo apt install php7.4-fpm libapache2-mod-fcgid`
+> - `sudo a2enmod proxy_fcgi setenvif actions fcgid alias`
+> - `sudo a2enconf php7.4-fpm`
+> - `sudo service apache2 restart`
 
 ---
 
@@ -71,12 +74,22 @@ https://linuxize.com/post/how-to-install-php-8-on-ubuntu-20-04/
 https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-20-04
 
 > - `sudo apt install mysql-server`
-> - `sudo service mysql start`
+> - `sudo service mysql start`  
+> should start without error
 
 ## Fix mysql-password
 
+> - `sudo service mysql stop`
+> - `sudo vim /etc/my.cnf`
+  > <pre>
+  > [mysqld]
+  > skip-grant-tables
+  > </pre>
+> - `sudo service mysql start`  
 > - `sudo mysql`
-> - `ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'mynewpassword';`
+> - `mysql> select mysql;`
+> - `mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'MyNewPass';`
+> - `mysql> exit`
 > - `sudo mysql_secure_installation`
 
 ## MySQL Secure Installation
@@ -103,10 +116,13 @@ The error should now be gone.
 
 # PhpMyAdmin
 
-- `sudo apt install phpmyadmin`
-  > ## Upgrade PhpMyAdamin from lower version without default repository
+> - `sudo apt install phpmyadmin`
+> - `sudo a2enconf phpmyadmin`
+> - `sudo service apache2 restart`
+
+## Upgrade PhpMyAdamin from lower version without default repository
   >
-  > https://devanswe.rs/manually-upgrade-phpmyadmin/  
+  > https://devanswers.co/manually-upgrade-phpmyadmin/  
   > Research for latest PhpMyAdmin version here: https://www.phpmyadmin.net/downloads/  
   > For version `5.2.0` there is a `config.sample.inc.php` located at `/usr/share/phpmyadmin`
   > use this file to copy and insert the 32-char blowfish_secret.
@@ -115,39 +131,12 @@ The error should now be gone.
 
 https://www.hostnet.de/faq/was-bedeutet-ab-sofort-muss-ein-geheimes-passwort-zur-verschluesselung-in-der-konfigurationsdatei-gesetzt-werden-blowfish_secret.html
 
-- `cd /usr/share/phpmyadmin`
-- `sudo cp config.sample.inc.php config.inc.php`
-- `sudo vim config.inc.php`
+> - `cd /usr/share/phpmyadmin`
+> - `sudo cp config.sample.inc.php config.inc.php`
+> - `sudo vim config.inc.php`
   > <pre>
   > $cfg['blowfish_secret'] = 'RANDOMPASSWORD';
   > </pre>
-
-## Will kept in the documentation in case it is needed some time
-
-- `sudo vi /etc/apache/conf-available/phpmyadmin.conf`
-  > <pre>
-  > Alias /phpmyadmin /usr/share/phpmyadmin
-  > Alias /phpMyAdmin /usr/share/phpmyadmin
-  > 
-  > &lt;Directory /usr/share/phpmyadmin/>
-  >   AddDefaultCharset UTF-8
-  >   &lt;IfModule mod_authz_core.c>
-  >      &lt;RequireAny>
-  >      Require all granted
-  >     &lt;/RequireAny>
-  >   &lt;/IfModule>
-  > &lt;/Directory>
-  > 
-  > &lt;Directory /usr/share/phpmyadmin/setup/>
-  >   &lt;IfModule mod_authz_core.c>
-  >     &lt;RequireAny>
-  >       Require all granted
-  >     &lt;/RequireAny>
-  >   &lt;/IfModule>
-  > &lt;/Directory>
-  > </pre>
-- `sudo a2enconf phpmyadmin`
-- `sudo service apache2 restart`
 
 ## PHP FCGI
 
@@ -176,17 +165,6 @@ https://tecadmin.net/setup-apache-php-fpm-ubuntu-20-04/
 Each virtual host has to use this `<FileMatch>`-directive to ensure processing of php-files.
 
 Request http://localhost/phpmyadmin to open login-page.
-
-## PhpMyAdmin Blowfish Secret
-
-https://www.hostnet.de/faq/was-bedeutet-ab-sofort-muss-ein-geheimes-passwort-zur-verschluesselung-in-der-konfigurationsdatei-gesetzt-werden-blowfish_secret.html
-
-- `cd /usr/share/phpmyadmin`
-- `sudo cp config.sample.inc.php config.inc.php`
-- `sudo vim config.inc.php`
-  > <pre>
-  > $cfg['blowfish_secret'] = 'RANDOMPASSWORD';
-  > </pre>
 
 # VIM
 
@@ -255,213 +233,6 @@ https://github.com/microsoft/WSL/issues/2113#issuecomment-704856068
 - `sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf`
   > <pre>
   > port= 8090
-  > </pre>
-
-# vhost-Script
-
-Source https://github.com/RoverWire/virtualhost  
-There are a few modifications compared to the source in the script below  
-Make sure to create the file without the trailing ".sh"
-
-- `cd /usr/local/bin`
-- `sudo vim vhost`
-  > <pre>
-  > #!/bin/bash
-  > ### Set Language
-  > TEXTDOMAIN=virtualhost
-  > 
-  > ### Set default parameters
-  > action=$1
-  > domain=$2
-  > relativeRootDir=${3:-''}
-  > owner=
-  > apacheUser=$(ps -ef | egrep '(httpd|apache2|apache)' | grep -v root | head -n1 | awk '{print $1}')
-  > email=
-  > sitesEnabled='/etc/apache2/sites-enabled/'
-  > sitesAvailable='/etc/apache2/sites-available/'
-  > webDir='/var/www/'
-  > 
-  > ### don't modify from here unless you know what you are doing ####
-  > 
-  > if [ "$(whoami)" != 'root' ]; then
-  > 	echo $"You have no permission to run $0 as non-root user. Use sudo"
-  > 		exit 1;
-  > fi
-  > 
-  > if [ "$action" != 'create' ] && [ "$action" != 'delete' ]
-  > 	then
-  > 		echo $"You need to prompt for action (create or delete) -- Lower-case only"
-  > 		exit 1;
-  > fi
-  > 
-  > while [ "$domain" == "" ]
-  > do
-  > 	echo -e $"Please provide domain. e.g. dev.project.local"
-  > 	read domain
-  > done
-  > 
-  > if [ "$action" == 'create' ] && [ "$relativeRootDir" == '' ]; then
-  > 	echo -e $"Is there a different root directory than $webDir$domain?\nPlease provide >the directory name. e.g. public"
-  > 	read relativeRootDir
-  > fi
-  > 
-  > appDir=$webDir$domain
-  > webRoot=$appDir/$relativeRootDir
-  > sitesAvailabledomain=$sitesAvailable$domain.conf
-  > 
-  > if [ "$action" == 'create' ]
-  > 	then
-  > 		### check if domain already exists
-  > 		if [ -e $sitesAvailabledomain ]; then
-  > 			echo -e $"This domain already exists.\nPlease Try Another one"
-  > 			exit;
-  > 		fi
-  > 
-  > 		### check if directory exists or not
-  > 		if ! [ -d $appDir ]; then
-  > 			### create the directory
-  > 			mkdir $appDir
-  >            		chown $owner:$owner $appDir
-  > 			### give permission to root dir
-  > 			chmod 775 $appDir
-  > 
-  > 			### create lower root directory if necessary
-  >            		if ! ["$relativeRootDir" == ""]; then
-  >                		mkdir $webRoot
-  >                		chown $owner:$owner $webRoot
-  >                		chmod 775 $webRoot
-  >            		fi
-  > 
-  > 			### write test file in the new domain dir
-  > 			if ! echo "<?php echo phpinfo(); ?>" > $webRoot/phpinfo.php
-  > 			then
-  > 				echo $"ERROR: Not able to write in file $webRoot/phpinfo.php. Please >check permissions"
-  > 				exit;
-  > 			else
-  > 				echo $"Added content to $webRoot/phpinfo.php"
-  > 			fi
-  > 		fi
-  > 
-  > 		### create virtual host rules file
-  > 		if ! echo "
-  > </pre>
-  > <pre>&lt;VirtualHost *:80></pre>
-  > <pre>
-  > 			ServerAdmin $email
-  > 			ServerName $domain
-  > 			ServerAlias $domain
-  > 			DocumentRoot $webRoot
-  > 			&lt;Directory />
-  > 				AllowOverride All
-  > 			&lt;/Directory>
-  > 			&lt;Directory $webRoot>
-  > 				Options +Indexes +FollowSymLinks +MultiViews
-  > 				AllowOverride all
-  > 				Require all granted
-  > 			&lt;/Directory>
-  > 			ErrorLog /var/log/apache2/$domain-error.log
-  > 			LogLevel error
-  > 			CustomLog /var/log/apache2/$domain-access.log combined
-  > 		&lt;/VirtualHost>" > $sitesAvailabledomain
-  > 		then
-  > 			echo -e $"There is an ERROR creating $domain file"
-  > 			exit;
-  > 		else
-  > 			echo -e $"\nNew Virtual Host Created\n"
-  > 		fi
-  > 
-  > 		### Add domain in /etc/hosts
-  > 		if ! echo "127.0.0.1	$domain" >> /etc/hosts
-  > 		then
-  > 			echo $"ERROR: Not able to write in /etc/hosts"
-  > 			exit;
-  > 		else
-  > 			echo -e $"Host added to /etc/hosts file \n"
-  > 		fi
-  > 
-  > 		### Add domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
-  > 		if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
-  > 		then
-  > 			if ! sudo echo -e "\r127.0.0.1       $domain" >> /mnt/c/Windows/System32/drivers/etc/hosts
-  > 			then
-  > 				echo $"ERROR: Not able to write in /mnt/c/Windows/System32/drivers/etc/hosts (Hint: Try running Bash as administrator)"
-  > 			else
-  > 				echo -e $"Host added to /mnt/c/Windows/System32/drivers/etc/hosts file \n"
-  > 			fi
-  > 		fi
-  > 
-  > 		if [ "$owner" == "" ]; then
-  > 			iam=$(whoami)
-  > 			if [ "$iam" == "root" ]; then
-  > 				chown -R $apacheUser:$apacheUser $appDir
-  > 			else
-  > 				chown -R $iam:$iam $appDir
-  > 			fi
-  > 		else
-  > 			chown -R $owner:$owner $appDir
-  > 		fi
-  > 
-  > 		### enable website
-  > 		a2ensite $domain
-  > 
-  > 		### restart Apache
-  > 		/etc/init.d/apache2 reload
-  > 
-  > 		### show the finished message
-  > 		echo -e $"Complete! \nYou now have a new Virtual Host \nYour new host is: http://$domain \nAnd its located at $appDir"
-  > 		exit;
-  > 	else
-  > 		### check whether domain already exists
-  > 		if ! [ -e $sitesAvailabledomain ]; then
-  > 			echo -e $"This domain does not exist.\nPlease try another one"
-  > 			exit;
-  > 		else
-  > 			### Delete domain in /etc/hosts
-  > 			newhost=${domain//./\\.}
-  > 			sed -i "/$newhost/d" /etc/hosts
-  > 
-  > 			### Delete domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
-  > 			if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
-  > 			then
-  > 				newhost=${domain//./\\.}
-  > 				sed -i "/$newhost/d" /mnt/c/Windows/System32/drivers/etc/hosts
-  > 			fi
-  > 
-  > 			### disable website
-  > 			a2dissite $domain
-  > 
-  > 			### restart Apache
-  > 			/etc/init.d/apache2 reload
-  > 
-  > 			### Delete virtual host rules files
-  > 			rm $sitesAvailabledomain
-  > 
-  > 			### Delete virtual host log files
-  > 			rm /var/log/apache2/$domain-error.log
-  > 			rm /var/log/apache2/$domain-access.log
-  > 		fi
-  > 
-  > 		### check if directory exists or not
-  > 		if [ -d $appDir ]; then
-  > 			echo -e $"Delete host root directory ? (y/n)"
-  > 			read deldir
-  > 
-  > 			if [ "$deldir" == 'y' -o "$deldir" == 'Y' ]; then
-  > 				### Delete the directory
-  > 				rm -rf $appDir
-  > 				
-  > 				echo -e $"Directory deleted"
-  > 			else
-  > 				echo -e $"Host directory conserved"
-  > 			fi
-  > 		else
-  > 			echo -e $"Host directory not found. Ignored"
-  > 		fi
-  > 
-  > 		### show the finished message
-  > 		echo -e $"Complete!\nYou just removed Virtual Host $domain"
-  > 		exit 0;
-  > fi
   > </pre>
 
 ## Add SSH-identity
@@ -537,6 +308,23 @@ https://github.com/RedberryProducts/configs/blob/php-cs-fixer/.php-cs-fixer.php
 
 https://www.digitalocean.com/community/tutorials/how-to-install-and-use-composer-on-ubuntu-20-04-de
 
+## Composer self-update fails
+
+Remove composer  
+> `sudo-apt remove composer`  
+
+Then install manually:  
+> `php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"`  
+> `php composer-setup.php`  
+> `php -r "unlink('composer-setup.php');"`
+> `sudo mv composer.phar /usr/local/bin/composer`  
+
+Check version afterwards:  
+> `composer --version`  
+
+Output: Composer version 2.5.8 2023-06-09 17:13:21
+> You should be able to run `composer global self-update` now.
+
 # SQlite >3.38 for PHP (relevant for e.g. JSON-columns in laravel >=9)
 
 https://vikborges.com/articles/making-php-8-use-the-latest-version-of-sqlite3-on-ubuntu-20-04-lts
@@ -564,5 +352,5 @@ https://www.ivarch.com/programs/pv.shtml
 > usefull to see for example progress of sql-import
 >
 > ```shell
-> $ pv sqlfile.sql | mysql -uxxx -pxxxx dbname
+> $ pv sqlfile.sql | mysql -u[USER] -p[PASSWORD] dbname
 > ```
