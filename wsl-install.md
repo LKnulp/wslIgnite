@@ -273,6 +273,23 @@ composer require friendsofphp/php-cs-fixer
 https://redberry.international/linting-a-laravel-project-using-cs-fixer/  
 https://github.com/RedberryProducts/configs/blob/php-cs-fixer/.php-cs-fixer.php
 
+## PHP CS-Fixer Config
+
+  ```json
+  "php-cs-fixer.config": "${workspaceFolder}/.php-cs-fixer.php",
+  "php-cs-fixer.allowRisky": false,
+  "php-cs-fixer.onsave": true,
+  "php-cs-fixer.autoFixBySemicolon": true,
+  "php-cs-fixer.pathMode": "override",
+  "php-cs-fixer.documentFormattingProvider": true,
+  "php-cs-fixer.rules": "@PSR12",
+  "php-cs-fixer.executablePath": "${extensionPath}/php-cs-fixer.phar",
+  "[php]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "junstyle.php-cs-fixer" //use this extension
+  },
+  ```
+
 # Aliases
 
 - `vim ~/.bash_aliases`
