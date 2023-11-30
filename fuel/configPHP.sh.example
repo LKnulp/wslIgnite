@@ -67,7 +67,7 @@ post_max_size=2048M
 for key in memory_limit upload_max_filesize post_max_size
 do
 	echo -e $"* ${PROCESSING}Setting $key for apache...\n${NC}"
-	sed -i "s/^\($key\).*/\1 $(eval echo = \${$key})/" $PHP_VERSION_PATH/$PHP/apache2/php.ini
+	sed -i "s/^\($key\).*/\1 $(eval echo = \${$key})/" $PHP_INI_PATH/$PHP/apache2/php.ini
 done
 
 echo -e $"* ${PROCESSING}Setting $key for apache...\n${NC}"
@@ -76,7 +76,7 @@ echo -e $"* ${PROCESSING}Setting $key for apache...\n${NC}"
 for key in upload_max_filesize post_max_size
 do
 	echo -e $"* ${PROCESSING}Setting $key for cli...\n${NC}"
-	sed -i "s/^\($key\).*/\1 $(eval echo = \${$key})/" $PHP_VERSION_PATH/$PHP/cli/php.ini
+	sed -i "s/^\($key\).*/\1 $(eval echo = \${$key})/" $PHP_INI_PATH/$PHP/cli/php.ini
 	
 	currentActivePhpDirective=$(php -i | grep $key)
 	echo -e $"* ${QUESTION}PHP-CLI says: $currentActivePhpDirective\n${NC}"
