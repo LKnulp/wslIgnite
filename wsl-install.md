@@ -177,6 +177,18 @@ Request http://localhost/phpmyadmin to open login-page.
 - `cd ~/.vscode-server/server-env-setup`
   > <pre>umask 002</pre>
 
+# WSL2-Config
+- Create file in `C:/USERS/[USER]/.wslconfig`
+
+> <pre>
+> [wsl2]
+> localhostForwarding=true
+> hostAddressLoopback=true
+>
+> [experimental]
+>networkingMode=mirrored
+> </pre>
+
 # WSL-Autostart
 
 https://github.com/troytse/wsl-autostart
