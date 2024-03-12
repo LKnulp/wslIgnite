@@ -190,11 +190,12 @@ Request http://localhost/phpmyadmin to open login-page.
 > </pre>
 
 # WSL-Autostart
+### This is only relevant for Ubuntu < 22.04.
 
 https://github.com/troytse/wsl-autostart
 This only starts services for the wsl instance set as default
 
-- PowerShell `wsl --set-default Ubuntu-20.04`
+- PowerShell `wsl --set-default Ubuntu-22.04`
 - WSL `sudo visudo`
   > <pre>
   > %sudo ALL=NOPASSWD: /etc/init.d/cron
@@ -204,7 +205,8 @@ This only starts services for the wsl instance set as default
   > %sudo ALL=NOPASSWD: /etc/init.d/supervisor
   > </pre>
 
-# WSL-Autostart Alternative
+# WSL-Autostart Alternative 
+### This is only relevant for Ubuntu < 22.04.
 
 - `cd /usr/local/bin`
 - `vim startup`
@@ -217,6 +219,15 @@ This only starts services for the wsl instance set as default
   > </pre>
 - `chmod 700 startup`
 
+# WSL-Autostart disable
+https://askubuntu.com/a/675756  
+Some services register automatically in `systemctl`-autostart when they are installed. To disable this behavior, use:
+
+- `sudo systemctl disable apache2`
+- `sudo systemctl disable mysql`
+
+Services disabled this way are still manageable via `sudo service {SERVICE} start/stop/status` but will not start on boot.
+  
 # Tmux
 
 - `sudo apt install tmux`
