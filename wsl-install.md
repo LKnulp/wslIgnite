@@ -194,8 +194,8 @@ Request http://localhost/phpmyadmin to open login-page.
 https://github.com/troytse/wsl-autostart
 This only starts services for the wsl instance set as default
 
-- `wsl --set-default Ubuntu-20.04`
-- `sudo visudo`
+- PowerShell `wsl --set-default Ubuntu-20.04`
+- WSL `sudo visudo`
   > <pre>
   > %sudo ALL=NOPASSWD: /etc/init.d/cron
   > %sudo ALL=NOPASSWD: /etc/init.d/mysql
