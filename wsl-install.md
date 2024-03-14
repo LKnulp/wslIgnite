@@ -181,12 +181,17 @@ Request http://localhost/phpmyadmin to open login-page.
 - Create file in `C:/USERS/[USER]/.wslconfig`
 
 > <pre>
-> [wsl2]
-> localhostForwarding=true
-> hostAddressLoopback=true
+>[wsl2]
+>swap=1G
+>memory=8G
 >
-> [experimental]
+>dnsTunneling=true
+>firewall=true
+>autoProxy=true
 >networkingMode=mirrored
+>
+>[experimental]
+>hostAddressLoopback=true
 > </pre>
 
 # WSL-Autostart
