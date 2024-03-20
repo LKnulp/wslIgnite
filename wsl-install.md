@@ -171,6 +171,9 @@ Request http://localhost/phpmyadmin to open login-page.
 - `cd ~`
 - `vim .vimrc`
   > <pre>set number</pre>
+- `ln -s ~/.vimrc /root/.vimrc`
+- `ln -s ~/.vim /root/.vim`
+- `ln -s ~/.viminfo /root/.viminfo`
 
 # VSCode Remote-Server
 
@@ -185,13 +188,13 @@ Request http://localhost/phpmyadmin to open login-page.
 >swap=1G
 >memory=8G
 >
+>localhostForwarding=true
 >dnsTunneling=true
->firewall=true
->autoProxy=true
->networkingMode=mirrored
+>networkingMode=NAT
 >
 >[experimental]
 >hostAddressLoopback=true
+>autoMemoryReclaim=gradual
 > </pre>
 
 # WSL-Autostart
@@ -203,10 +206,10 @@ This only starts services for the wsl instance set as default
 - PowerShell `wsl --set-default Ubuntu-22.04`
 - WSL `sudo visudo`
   > <pre>
+  > %sudo ALL=NOPASSWD: /etc/init.d/docker
   > %sudo ALL=NOPASSWD: /etc/init.d/cron
-  > %sudo ALL=NOPASSWD: /etc/init.d/mysql
-  > %sudo ALL=NOPASSWD: /etc/init.d/apache2
-  > %sudo ALL=NOPASSWD: /etc/init.d/php8.0-fpm
+  > #%sudo ALL=NOPASSWD: /etc/init.d/mysql
+  > #%sudo ALL=NOPASSWD: /etc/init.d/apache2
   > %sudo ALL=NOPASSWD: /etc/init.d/supervisor
   > </pre>
 
@@ -214,13 +217,13 @@ This only starts services for the wsl instance set as default
 ### This is only relevant for Ubuntu < 22.04.
 
 - `cd /usr/local/bin`
-- `vim startup`
+- `sudo vim startup`
   > <pre>
+  > /etc/init.d/docker start
   > /etc/init.d/cron start
-  > /etc/init.d/mysql start
-  > /etc/init.d/apache2 start
-  > /etc/init.d/supervisor start
-  > /etc/init.d/php8.0-fpm start
+  > #/etc/init.d/mysql start
+  > #/etc/init.d/apache2 start
+  > #/etc/init.d/supervisor start
   > </pre>
 - `chmod 700 startup`
 

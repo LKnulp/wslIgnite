@@ -14,12 +14,15 @@ function show_help {
 	echo -e "   ========================================="
 	echo -e "	OPTIONS := { "
 	echo -e "		-a[liases]		skip install of .bash_aliases"
-	echo -e "		-c[hangePHP] 		skip install of changePHP-script"
+	echo -e "		-c[hangePHP] 	skip install of changePHP-script"
 	echo -e "		-e[ditor]		skip install of .vimrc config"
 	echo -e "		-t[mux]			skip install of .tmux-config"
 	echo -e "		-v[host]		skip install of vhost-script"
 	echo -e "		-w[sl]			skip install of wsl.conf"
 	echo -e "		-p[hp]			skip install of configPHP-script"
+	echo -e "		-n[node]		skip install nodeJS"
+	echo -e "		-d[docker]		skip install docker"
+	echo -e "		-l[ando]		skip install lando"
 	echo -e "		==================================================="
 	echo -e "       -r[emove]       remove all parts"
 	echo -e "		==================================================="
@@ -36,6 +39,9 @@ vimrc="true"
 vhost="true"
 wsl="true"
 configPHP="true"
+nodejs="true"
+docker="true"
+lando="true"
 install="true"
 remove="false"
 configFile=./spark.conf
@@ -50,6 +56,9 @@ while [ -n "$1" ]; do # while loop starts
 		-v) vhost="false";;
 		-w) wsl="false";;
 		-p) configPHP="false";;
+		-n) nodejs="false";;
+		-d) docker="false";;
+		-l) lando="false";;
 		-r) install="false"
 			remove="true"
 			;;
@@ -74,6 +83,9 @@ if [ $debug == "true" ]; then
 	echo -e "   ${PROCESSING}vhost:${NC} $vhost"
 	echo -e "   ${PROCESSING}wsl:${NC} $wsl"
 	echo -e "   ${PROCESSING}configPHP:${NC} $configurePHP"
+	echo -e "   ${PROCESSING}nodeJS:${NC} $nodejs"
+	echo -e "   ${PROCESSING}docker:${NC} $docker"
+	echo -e "   ${PROCESSING}lando:${NC} $lando"
 	echo -e " ========"
 	echo -e "   ${PROCESSING}install:${NC} $install"
 	echo -e "   ${PROCESSING}remove:${NC} $remove"
@@ -125,6 +137,34 @@ if [ $$WSL_IGNITE_USER == '' ]; then
 fi
 
 if [ $install == "true" ]; then
+	
+	echo -e $"* ${PROCESSING}Installing general tooling ...\n${NC}"
+
+	apt update
+	apt upgrade
+	mkdir ~/downloads
+	chown $$WSL_IGNITE_USER:$$WSL_IGNITE_USER ~/downloads
+	cd ~/downloads
+	apt install curl
+
+	echo -e $"* ${PROCESSING}Fixing permission-issues ...\n${NC}"
+
+	cat $HOME/.vscode-server/server-env-setup >> umask 002
+	cat /etc/profile >> umask 002
+	cat $HOME/.profile >> umask 002
+	cat $HOME/.bashrc >> umask 002
+
+	echo -e $"* ${PROCESSING}Fixing autostart-issues in advance ...\n${NC}"
+
+	cat /usr/local/bin/startup >> /etc/init.d/docker start\n#/etc/init.d/cron start\n#/etc/init.d/mysql start\n#/etc/init.d/apache2 start\n#/etc/init.d/supervisor start
+	chmod 700 /usr/local/bin/startup
+	systemctl disable apache2
+	systemctl disable mysql
+
+	/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code /mnt/c/Users/$WSL_IGNITE_WINDOWS_USER/.wslconfig
+
+	echo -e -n $"${QUESTION}Configuration OK?... Great! Press ENTER to continue...${NC}\n"
+	read configSet
 
 	if [[ $changePHP == "true" || $vhost == "true" || $configPHP == "true" ]]; then
 		echo -e $"* ${PROCESSING}Installing wslIgnite.conf...\n${NC}"
@@ -169,23 +209,31 @@ if [ $install == "true" ]; then
 		echo -e $"* ${PROCESSING}Installing vimrc...\n${NC}"
 
 		cp $SCRIPT_DIR/fuel/vimrc.example $SCRIPT_DIR/vimrc
-		mkdir $HOME/.vim 
+		mkdir $HOME/.vim
+		mkdir /root/.vim
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim 
 		mkdir $HOME/.vim/autoload
+		mkdir /root/.vim/autoload
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/autoload 
 		mkdir $HOME/.vim/backup
+		mkdir /root/.vim/backup
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/backup 
 		mkdir $HOME/.vim/colors
+		mkdir /root/.vim/colors
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/colors 
 		mkdir $HOME/.vim/plugged
+		mkdir /root/.vim/plugged
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/plugged
 		ln -sf $SCRIPT_DIR/vimrc $HOME/.vimrc
+		ln -sf $SCRIPT_DIR/vimrc /root/.vimrc
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $SCRIPT_DIR/vimrc
 		cd $HOME/.vim/colors
 		echo -e $"* ${PROCESSING}Installing vim colorscheme 'molokai'...\n${NC}"
 		curl -o molokai.vim https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim
-		echo -e "\n"
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/colors/molokai.vim
+		cd /root/.vim/colors
+		curl -o molokai.vim https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim
+		echo -e "\n"
 	fi
 
 	if [ $vhost == "true" ]; then
@@ -200,10 +248,12 @@ if [ $install == "true" ]; then
 	if [ $wsl == "true" ]; then
 		echo -e $"* ${PROCESSING}Installing wsl.conf...\n${NC}"
 
+		rm $WSL_IGNITE_WSLCONF_PATH/wsl.conf
 		cp $SCRIPT_DIR/fuel/wsl.conf.example $SCRIPT_DIR/wsl.conf
 		ln -sf $SCRIPT_DIR/wsl.conf $WSL_IGNITE_WSLCONF_PATH/wsl.conf
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $WSL_IGNITE_WSLCONF_PATH/wsl.conf
         chmod 666 $SCRIPT_DIR/wsl.conf
+		ln -sf $SCRIPT_DIR/wsl.conf $WSL_IGNITE_WSLCONF_PATH/wsl.conf
 		/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code $SCRIPT_DIR/wsl.conf > /dev/null
 	fi
 
@@ -214,6 +264,35 @@ if [ $install == "true" ]; then
 		ln -sf $SCRIPT_DIR/configPHP.sh $WSL_IGNITE_EXEC_PATH/configPHP
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $WSL_IGNITE_EXEC_PATH/configPHP
 		chmod 775 $SCRIPT_DIR/configPHP.sh
+	fi
+
+	if [ $nodejs == "true" ]; then
+		echo -e $"* ${PROCESSING}Installing nodeJS...\n${NC}"
+
+		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+		source ~/.bashrc
+	fi
+
+	if [ $docker == "true" ]; then
+		echo -e $"* ${PROCESSING}Installing docker...\n${NC}"
+
+		apt-get install ca-certificates curl
+		install -m 0755 -d /etc/apt/keyrings
+		curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+		chmod a+r /etc/apt/keyrings/docker.asc
+		echo \
+		"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+		$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+		tee /etc/apt/sources.list.d/docker.list > /dev/null
+		apt-get update
+		apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+	fi
+
+	if [ $lando == "true" ]; then
+		echo -e $"* ${PROCESSING}Installing lando...\n${NC}"
+
+		wget https://files.lando.dev/installer/lando-x64-stable.deb
+		dpkg -i lando-x64-stable.deb
 	fi
 
 	echo -e -n $"${QUESTION}Please check VS-Code to complete all installed config-files. Press ENTER to continue...${NC}\n"
