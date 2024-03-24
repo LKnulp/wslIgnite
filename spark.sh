@@ -97,16 +97,16 @@ if [ $debug == "true" ]; then
 	exit 1;
 fi
 
-if [ $install == "true" ]; then
-	echo -e $"\n* ${PROCESSING}We will start VS-Code. Installation will continue here...${NC}\n"
-else
-	echo -e $"\n* ${PROCESSING}We will start VS-Code. Uninstall will continue here...${NC}\n"
+if [ "$(whoami)" != 'root' ]; then
+	echo -e $"${ERROR}You have no permission to run $0 as non-root user. Use sudo! ${NC}"
+	exit 0;
 fi
 
-/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code > /dev/null
-sleep 1s
-echo -e $"* ${PROCESSING}Starting VS-Code...${NC}\n"
-sleep 1s
+if [ $install == "true" ]; then
+	echo -e $"\n* ${PROCESSING}Installation will continue here...${NC}\n"
+else
+	echo -e $"\n* ${PROCESSING}Uninstall will continue here...${NC}\n"
+fi
 
 if [ $install == "true" ]; then
 	echo -e $"* ${PROCESSING}Installing spark.conf...\n${NC}"
@@ -131,7 +131,7 @@ else
 	chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $SCRIPT_DIR/spark.conf
 fi
 
-if [ $$WSL_IGNITE_USER == '' ]; then
+if [ $WSL_IGNITE_USER == '' ]; then
 	echo -e $"${ERROR}There is no user set in the configuration. Please check!${NC}"
 	exit 1;
 fi
@@ -142,36 +142,41 @@ if [ $install == "true" ]; then
 
 	apt update
 	apt upgrade
-	mkdir ~/downloads
-	chown $$WSL_IGNITE_USER:$$WSL_IGNITE_USER ~/downloads
-	cd ~/downloads
+	mkdir /home/$WSL_IGNITE_USER/downloads
+	chown $WSL_IGNITE_USER:$WSL_IGNITE_USER /home/$WSL_IGNITE_USER~/downloads
+	cd /home/$WSL_IGNITE_USER/downloads
 	apt install curl
+	apt-get install ca-certificates
 
 	echo -e $"* ${PROCESSING}Fixing permission-issues ...\n${NC}"
 
-	cat $HOME/.vscode-server/server-env-setup >> umask 002
-	cat /etc/profile >> umask 002
-	cat $HOME/.profile >> umask 002
-	cat $HOME/.bashrc >> umask 002
+	echo 'umask 002' >> /home/$WSL_IGNITE_USER/.vscode-server/server-env-setup
+	echo 'umask 002' >> /etc/profile
+	echo 'umask 002' >> /home/$WSL_IGNITE_USER/.profile
+	echo 'umask 002' >> /home/$WSL_IGNITE_USER/.bashrc
 
 	echo -e $"* ${PROCESSING}Fixing autostart-issues in advance ...\n${NC}"
 
-	cat /usr/local/bin/startup >> /etc/init.d/docker start\n#/etc/init.d/cron start\n#/etc/init.d/mysql start\n#/etc/init.d/apache2 start\n#/etc/init.d/supervisor start
+	echo '/etc/init.d/docker start' >> /usr/local/bin/startup 
+	echo '#/etc/init.d/cron start' >> /usr/local/bin/startup
+	echo '#/etc/init.d/mysql start' >> /usr/local/bin/startup
+	echo '#/etc/init.d/apache2 start' >> /usr/local/bin/startup
+	echo '#/etc/init.d/supervisor start' >> /usr/local/bin/startup
 	chmod 700 /usr/local/bin/startup
 	systemctl disable apache2
 	systemctl disable mysql
-
-	/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code /mnt/c/Users/$WSL_IGNITE_WINDOWS_USER/.wslconfig
-
-	echo -e -n $"${QUESTION}Configuration OK?... Great! Press ENTER to continue...${NC}\n"
-	read configSet
 
 	if [[ $changePHP == "true" || $vhost == "true" || $configPHP == "true" ]]; then
 		echo -e $"* ${PROCESSING}Installing wslIgnite.conf...\n${NC}"
 		
 		cp $SCRIPT_DIR/fuel/wslIgnite.conf.example $SCRIPT_DIR/wslIgnite.conf
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $SCRIPT_DIR/wslIgnite.conf
-		/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code $SCRIPT_DIR/wslIgnite.conf > /dev/null
+		echo -e -n $"${QUESTION}Please complete wslIgnite.conf. Press ENTER to continue...${NC}\n"
+		read configSet
+		nano $SCRIPT_DIR/wslIgnite.conf
+
+		echo -e -n $"${QUESTION}Configuration OK?... Great! Press ENTER to continue...${NC}\n"
+		read configSet
 	fi
 
 	if [ $changePHP == "true" ]; then
@@ -187,21 +192,25 @@ if [ $install == "true" ]; then
 		echo -e $"* ${PROCESSING}Installing .bash_aliases...\n${NC}"
 
 		cp $SCRIPT_DIR/fuel/.bash_aliases.example $SCRIPT_DIR/.bash_aliases
-		cat $SCRIPT_DIR/.bash_aliases >> $HOME/.bash_aliases
+		cat $SCRIPT_DIR/.bash_aliases >> /home/$WSL_IGNITE_USER/.bash_aliases
 		echo > $SCRIPT_DIR/.bash_aliases
-		cat $HOME/.bash_aliases >> $SCRIPT_DIR/.bash_aliases
-		rm $HOME/.bash_aliases
-		ln -sf $SCRIPT_DIR/.bash_aliases $HOME/.bash_aliases
+		cat /home/$WSL_IGNITE_USER/.bash_aliases >> $SCRIPT_DIR/.bash_aliases
+		rm /home/$WSL_IGNITE_USER/.bash_aliases
+		ln -sf $SCRIPT_DIR/.bash_aliases /home/$WSL_IGNITE_USER/.bash_aliases
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $SCRIPT_DIR/.bash_aliases
-		/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code $SCRIPT_DIR/.bash_aliases > /dev/null
-		source $HOME/.bashrc
+		echo -e -n $"${QUESTION}Please complete bash_aliases. Press ENTER to continue...${NC}\n"
+		read configSet
+		nano $SCRIPT_DIR/.bash_aliases
+
+		echo -e -n $"${QUESTION}Configuration OK?... Great! Press ENTER to continue...${NC}\n"
+		read configSet
 	fi
 
 	if [ $tmux == "true" ]; then
 		echo -e $"* ${PROCESSING}Installing tmux.conf...\n${NC}"
 
 		cp $SCRIPT_DIR/fuel/tmux.conf.example $SCRIPT_DIR/tmux.conf
-		ln -sf $SCRIPT_DIR/tmux.conf $HOME/.tmux.conf
+		ln -sf $SCRIPT_DIR/tmux.conf /home/$WSL_IGNITE_USER/.tmux.conf
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $SCRIPT_DIR/tmux.conf
 	fi
 
@@ -209,28 +218,28 @@ if [ $install == "true" ]; then
 		echo -e $"* ${PROCESSING}Installing vimrc...\n${NC}"
 
 		cp $SCRIPT_DIR/fuel/vimrc.example $SCRIPT_DIR/vimrc
-		mkdir $HOME/.vim
+		mkdir /home/$WSL_IGNITE_USER/.vim
 		mkdir /root/.vim
-		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim 
-		mkdir $HOME/.vim/autoload
+		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER /home/$WSL_IGNITE_USER/.vim 
+		mkdir /home/$WSL_IGNITE_USER/.vim/autoload
 		mkdir /root/.vim/autoload
-		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/autoload 
-		mkdir $HOME/.vim/backup
+		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER /home/$WSL_IGNITE_USER/.vim/autoload 
+		mkdir /home/$WSL_IGNITE_USER/.vim/backup
 		mkdir /root/.vim/backup
-		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/backup 
-		mkdir $HOME/.vim/colors
+		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER /home/$WSL_IGNITE_USER/.vim/backup 
+		mkdir /home/$WSL_IGNITE_USER/.vim/colors
 		mkdir /root/.vim/colors
-		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/colors 
-		mkdir $HOME/.vim/plugged
+		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER /home/$WSL_IGNITE_USER/.vim/colors 
+		mkdir /home/$WSL_IGNITE_USER/.vim/plugged
 		mkdir /root/.vim/plugged
-		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/plugged
-		ln -sf $SCRIPT_DIR/vimrc $HOME/.vimrc
+		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER /home/$WSL_IGNITE_USER/.vim/plugged
+		ln -sf $SCRIPT_DIR/vimrc /home/$WSL_IGNITE_USER/.vimrc
 		ln -sf $SCRIPT_DIR/vimrc /root/.vimrc
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $SCRIPT_DIR/vimrc
-		cd $HOME/.vim/colors
+		cd /home/$WSL_IGNITE_USER/.vim/colors
 		echo -e $"* ${PROCESSING}Installing vim colorscheme 'molokai'...\n${NC}"
 		curl -o molokai.vim https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim
-		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.vim/colors/molokai.vim
+		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER /home/$WSL_IGNITE_USER/.vim/colors/molokai.vim
 		cd /root/.vim/colors
 		curl -o molokai.vim https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim
 		echo -e "\n"
@@ -254,7 +263,12 @@ if [ $install == "true" ]; then
 		chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $WSL_IGNITE_WSLCONF_PATH/wsl.conf
         chmod 666 $SCRIPT_DIR/wsl.conf
 		ln -sf $SCRIPT_DIR/wsl.conf $WSL_IGNITE_WSLCONF_PATH/wsl.conf
-		/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code $SCRIPT_DIR/wsl.conf > /dev/null
+		echo -e -n $"${QUESTION}Please check to complete wsl.conf. Press ENTER to continue...${NC}\n"
+		read configSet
+		nano $SCRIPT_DIR/wsl.conf
+
+		echo -e -n $"${QUESTION}Configuration OK?... Great! Press ENTER to continue...${NC}\n"
+		read configSet
 	fi
 
 	if [ $configPHP == "true" ]; then
@@ -268,6 +282,7 @@ if [ $install == "true" ]; then
 
 	if [ $nodejs == "true" ]; then
 		echo -e $"* ${PROCESSING}Installing nodeJS...\n${NC}"
+		cd /home/$WSL_IGNITE_USER/downloads
 
 		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 		source ~/.bashrc
@@ -276,7 +291,6 @@ if [ $install == "true" ]; then
 	if [ $docker == "true" ]; then
 		echo -e $"* ${PROCESSING}Installing docker...\n${NC}"
 
-		apt-get install ca-certificates curl
 		install -m 0755 -d /etc/apt/keyrings
 		curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 		chmod a+r /etc/apt/keyrings/docker.asc
@@ -290,13 +304,13 @@ if [ $install == "true" ]; then
 
 	if [ $lando == "true" ]; then
 		echo -e $"* ${PROCESSING}Installing lando...\n${NC}"
-
+		
+		cd /home/$WSL_IGNITE_USER/downloads
 		wget https://files.lando.dev/installer/lando-x64-stable.deb
 		dpkg -i lando-x64-stable.deb
 	fi
 
-	echo -e -n $"${QUESTION}Please check VS-Code to complete all installed config-files. Press ENTER to continue...${NC}\n"
-	read installComplete
+	apt autoremove
 
 	echo -e $"\n${SUCCESS}Installation complete!!${NC}"
 	echo -e $"${QUESTION}Please run source ~/.bashrc to enable new configuration${NC}\n"
@@ -304,6 +318,27 @@ if [ $install == "true" ]; then
 fi
 
 if [ $remove == "true" ]; then
+
+	rm -rf /home/$WSL_IGNITE_USER/downloads
+
+	echo -e $"\n* ${PROCESSING}Removing lando...\n${NC}"
+
+	apt purge -y lando 
+
+	echo -e $"\n* ${PROCESSING}Removing nvm & nodeJS...\n${NC}"
+
+	nvm deactivate
+	for dir in /home/$WSL_IGNITE_USER/.nvm/versions/node/*/; \
+	do nvm uninstall "$dir"; \
+	done
+	rm -rf /home/$WSL_IGNITE_USER/.nvm
+
+	echo -e $"\n* ${PROCESSING}Removing docker...\n${NC}"
+
+	apt purge -y ca-certificates docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+	rm /etc/apt/keyrings/docker.asc
+	rm /etc/apt/sources.list.d/docker.list
+	rm /etc/init.d/docker
 
 	echo -e $"\n* ${PROCESSING}Removing wslIgnite.conf...\n${NC}"
 	
@@ -316,23 +351,31 @@ if [ $remove == "true" ]; then
 
 	echo -e $"* ${PROCESSING}Removing .bash_aliases...\n${NC}"
 
-	rm $HOME/.bash_aliases
-	cat $SCRIPT_DIR/.bash_aliases >> $HOME/.bash_aliases
-	chown $WSL_IGNITE_USER:$WSL_IGNITE_USER $HOME/.bash_aliases
+	rm /home/$WSL_IGNITE_USER/.bash_aliases
+	cat $SCRIPT_DIR/.bash_aliases >> /home/$WSL_IGNITE_USER/.bash_aliases
+	chown $WSL_IGNITE_USER:$WSL_IGNITE_USER /home/$WSL_IGNITE_USER/.bash_aliases
 	rm $SCRIPT_DIR/.bash_aliases
-	/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code $HOME/.bash_aliases > /dev/null
-	source $HOME/.bashrc
+	echo -e -n $"${QUESTION}Please check to complete bash_aliases. Press ENTER to continue...${NC}\n"
+	read configSet
+	nano /home/$WSL_IGNITE_USER/.bash_aliases
+
+	echo -e -n $"${QUESTION}Configuration OK?... Great! Press ENTER to continue...${NC}\n"
+	read configSet
 
 	echo -e $"* ${PROCESSING}Removing tmux.conf...\n${NC}"
 
-	rm $HOME/.tmux.conf
+	rm /home/$WSL_IGNITE_USER/.tmux.conf
 	rm $SCRIPT_DIR/tmux.conf
 
 	echo -e $"* ${PROCESSING}Removing vimrc...\n${NC}"
 
-	rm $HOME/.vimrc
+	rm /home/$WSL_IGNITE_USER/.vimrc
 	rm $SCRIPT_DIR/vimrc
-	rm -Rf $HOME/.vim 
+	rm -Rf /home/$WSL_IGNITE_USER/.vim 
+	
+	rm -Rf /root/.vim
+	rm /root/.viminfo
+	rm /root/.vimrc
 
 	echo -e $"* ${PROCESSING}Removing vhost-tool...\n${NC}"
 
@@ -352,9 +395,6 @@ if [ $remove == "true" ]; then
 	echo -e $"* ${PROCESSING}Removing spark.conf...\n${NC}"
 
 	rm $SCRIPT_DIR/spark.conf
-
-	echo -e -n $"${QUESTION}Please check VS-Code to see your new .bash_alises file. Press ENTER to continue...${NC}\n"
-	read installComplete
 
 	echo -e $"\n${SUCCESS}Uninstall complete!!${NC}"
 	echo -e $"${QUESTION}Please run source ~/.bashrc to enable new configuration${NC}\n"
