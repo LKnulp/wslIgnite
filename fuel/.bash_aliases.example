@@ -17,6 +17,7 @@ alias e-winHosts='/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin/code /mnt/c/Wind
 ### GENERAL
 alias setSource='source $HOME/.bashrc'
 alias apti='apt install -y'
+alias dockerStopAll='docker stop $(docker ps -a -q)'
 alias setssh='ssh-add ~/.ssh/id_rsa'
 
 ### GIT
